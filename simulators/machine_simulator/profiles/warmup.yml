@@ -1,0 +1,18 @@
+failures:
+  - type: thermal_vibration_cascade
+    machine: Machine-03
+    mean_occurrences_per_simulated_week: 2
+    jitter_pct: 30
+    duration_simulated_minutes: 15
+
+  - type: heartbeat_loss
+    machine: Machine-04
+    mean_occurrences_per_simulated_week: 1
+    jitter_pct: 50
+    duration_simulated_minutes: 10
+
+  - type: refractory_degradation
+    machine: Machine-01
+    mean_occurrences_per_simulated_week: 0.5
+    jitter_pct: 20
+    duration_simulated_minutes: 480

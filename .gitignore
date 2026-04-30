@@ -1,0 +1,34 @@
+# Environment — never commit real credentials
+.env
+
+# Kafka SASL credentials — copy from .example and fill in
+secrets/kafka_server_jaas.conf
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# Training data — too large for git; distribute via snapshot
+training_data/harmonicmesh/
+
+# Neo4j snapshot archives — distribute via GitHub Releases
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MLflow run artifacts (local)
+mlruns/

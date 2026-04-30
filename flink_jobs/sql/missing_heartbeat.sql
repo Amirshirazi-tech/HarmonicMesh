@@ -1,0 +1,3 @@
+-- Phase 6: Missing Heartbeat detection via Flink SQL LEFT JOIN.
+-- Waehner recommendation: express missing-event detection as LEFT JOIN,
+-- not as a negative pattern, for better state management.

@@ -1,0 +1,2 @@
+-- Phase 6: EDI Sequence Violation detection via MATCH_RECOGNIZE.
+-- Validates PO -> ORDRSP -> DESADV -> RECADV -> INVOIC per trading partner.
