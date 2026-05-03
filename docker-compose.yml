@@ -113,6 +113,11 @@ services:
       - "8181:8081"
     command: jobmanager
     environment:
+      # Kafka SASL credentials are read by the CEP job at startup
+      # (ThermalVibrationCascadeJob.requireEnv). Substituted from .env at
+      # `docker compose up` time, the same way kafka-ui sources them.
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD}"
       FLINK_PROPERTIES: |
         jobmanager.rpc.address: flink-jobmanager
         jobmanager.memory.process.size: 1600m
@@ -137,6 +142,10 @@ services:
       flink-jobmanager:
         condition: service_healthy
     environment:
+      # Same as flink-jobmanager — the TaskManager runs the actual Kafka
+      # connector code, so it needs SASL credentials in its environment too.
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD}"
       FLINK_PROPERTIES: |
         jobmanager.rpc.address: flink-jobmanager
         taskmanager.numberOfTaskSlots: 4

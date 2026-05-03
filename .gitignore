@@ -22,7 +22,7 @@ training_data/harmonicmesh/
 *.tar.gz
 
 # IDE
-*.idea/
+.idea/
 .vscode/
 *.iml
 
