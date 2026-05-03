@@ -4,9 +4,14 @@ Three v1 patterns, one per CEP surface:
 
 | Pattern | Method | Phase |
 |---|---|---|
-| Thermal-Vibration Cascade | Pattern API (Python) | 3 |
+| Thermal-Vibration Cascade | Pattern API (Java) | 3 |
 | Missing Heartbeat | Flink SQL LEFT JOIN | 6 |
 | EDI Sequence Violation | MATCH_RECOGNIZE | 6 |
+
+> **Note on language.** The Pattern API is implemented in **Java**, not
+> Python — PyFlink does not expose CEP bindings in any released version.
+> The rest of the project (machine simulator, agent, dashboard) remains
+> Python; only Flink CEP code lives under `flink_jobs/java/`.
 
 ---
 
@@ -16,21 +21,21 @@ Detects the bearing-failure precursor on Machine-03. Three sequential sensor ano
 
 ### Operator structure
 
-```
-Pattern.begin("temp_anomaly", AfterMatchSkipStrategy.skip_past_last_event())
+```java
+Pattern.<SensorEvent>begin("temp_anomaly", AfterMatchSkipStrategy.skipPastLastEvent())
        .where(temperature_c > baseline_temp + offset)
-       .followed_by("vib_anomaly")
+       .followedBy("vib_anomaly")
        .where(vibration_rms_mm_s > threshold)
-       .followed_by("current_anomaly")
+       .followedBy("current_anomaly")
        .where(|current_a - baseline_current| / baseline_current > deviation_pct)
-       .within(Time.minutes(10))
+       .within(Duration.ofMinutes(10))
 ```
 
-Both transitions use `.followed_by(...)` (relaxed contiguity): events between cascade steps are tolerated, which matches the simulator where every tick emits all three sensors and we only react to the ones crossing their threshold. `AfterMatchSkipStrategy.skip_past_last_event()` ensures one cascade emits one match.
+Both transitions use `.followedBy(...)` (relaxed contiguity): events between cascade steps are tolerated, which matches the simulator where every tick emits all three sensors and we only react to the ones crossing their threshold. `AfterMatchSkipStrategy.skipPastLastEvent()` ensures one cascade emits one match.
 
 ### Threshold mapping (Machine-03)
 
-The spec's original phrasing — *"temperature > 85 °C"* — was missing its qualifier; the intent is *85 °C above baseline*, or for Machine-03 specifically, **temperature 60 °C above its 320 °C baseline**. Thresholds are loaded from `flink_jobs/python/config/machine_baselines.yaml` at job startup; runtime baseline learning is v2 scope.
+The spec's original phrasing — *"temperature > 85 °C"* — was missing its qualifier; the intent is *85 °C above baseline*, or for Machine-03 specifically, **temperature 60 °C above its 320 °C baseline**. Thresholds are loaded from `flink_jobs/config/machine_baselines.yaml` at job startup (bundled into the JAR as a classpath resource via the Maven build); runtime baseline learning is v2 scope.
 
 | Sensor | Predicate form | Machine-03 values | Effective threshold |
 |---|---|---|---|
@@ -44,8 +49,8 @@ All three predicates use **strict `>`** (not `>=`). Equality at the threshold is
 
 End-to-end event time. The watermark strategy is:
 
-- `WatermarkStrategy.for_bounded_out_of_orderness(Duration.of_seconds(5))`
-- `.with_idleness(Duration.of_seconds(30))`
+- `WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofSeconds(5))`
+- `.withIdleness(Duration.ofSeconds(30))`
 - timestamp pulled from each event's `event_time` JSON field, parsed to milliseconds
 
 The 5 s out-of-orderness budget is generous for a synthetic stream where producer threads briefly desync under high time-compression; it is small enough that real cascades, which span minutes, are never delayed perceptibly. The 30 s idleness flag lets the partition stop holding back watermark progression during quiet periods so `.within(10m)` deadlines fire on schedule.
@@ -75,9 +80,13 @@ Published to `harmonicmesh.patterns.machine-03` as JSON:
 
 ### Source code
 
-- Job: `flink_jobs/python/thermal_vibration_cascade.py`
-- Baselines: `flink_jobs/python/config/machine_baselines.yaml`
-- Tests: `tests/flink/test_thermal_vibration_cascade.py`
+- Job: `flink_jobs/java/src/main/java/com/harmonicmesh/cep/ThermalVibrationCascadeJob.java`
+- Conditions / selector: same file (top-level static classes)
+- POJO: `flink_jobs/java/src/main/java/com/harmonicmesh/cep/SensorEvent.java`
+- Baselines loader: `flink_jobs/java/src/main/java/com/harmonicmesh/cep/MachineBaselines.java`
+- Baselines values: `flink_jobs/config/machine_baselines.yaml`
+- Tests: `flink_jobs/java/src/test/java/com/harmonicmesh/cep/ThermalVibrationCascadeJobTest.java`
+- Build / submit instructions: `flink_jobs/java/README.md`
 
 ---
 
