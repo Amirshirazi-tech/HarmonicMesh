@@ -32,3 +32,5 @@ Thumbs.db
 
 # MLflow run artifacts (local)
 mlruns/
+/repotClaud.txt
+/CLAUDE.md

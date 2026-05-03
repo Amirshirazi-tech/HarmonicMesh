@@ -1,0 +1,20 @@
+# Per-machine sensor baselines used by Flink CEP threshold conditions.
+#
+# Loaded once at job startup. Baselines are STATIC, set from machine
+# specifications and the simulator's normal-operation profile — they are
+# NOT learned from the stream. Runtime baseline learning is v2 scope.
+#
+# When a new failure mode or pattern is added that needs a deviation
+# threshold, the corresponding baseline goes here so the predicate is
+# self-documenting and version-controlled alongside the pattern code.
+
+Machine-03:
+  # Hot rolling mill. See simulators/machine_simulator/failure_modes.py
+  # ThermalVibrationCascade for the cascade definition this baseline supports.
+  baseline_temperature_c: 320.0   # normal operating temperature
+  baseline_current_a: 415.0       # normal current draw
+
+  # Thresholds for the Thermal-Vibration Cascade pattern (Phase 3).
+  cascade_temperature_offset_c: 60.0     # additive: fires when temp_c > baseline + 60
+  cascade_vibration_threshold_mm_s: 4.5  # absolute: clean threshold above noise floor
+  cascade_current_deviation_pct: 0.15    # symmetric: |cur - baseline| / baseline > 0.15
