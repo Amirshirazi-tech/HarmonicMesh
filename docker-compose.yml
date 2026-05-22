@@ -9,6 +9,7 @@ volumes:
   neo4j_data:
   neo4j_logs:
   mlflow_data:
+  hf_cache:        # HuggingFace model cache for the pattern_ingester (bge models)
 
 services:
 
@@ -172,6 +173,40 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  # ── Pattern Ingester (Phase 4: Kafka → Graphiti) ─────────────────────────────
+  # Reactive consumer: reads CEP pattern matches from
+  # harmonicmesh.patterns.machine-03 and writes them into Graphiti/Neo4j as
+  # natural-language episodes. Consumer group: harmonicmesh-graphiti-ingester.
+  pattern-ingester:
+    build:
+      context: .
+      dockerfile: consumers/Dockerfile
+    container_name: harmonicmesh-pattern-ingester
+    networks:
+      - harmonicmeshnet
+    depends_on:
+      kafka:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD}"
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD}"
+      # OpenRouter (OpenAI-compatible) — Graphiti ingestion-time entity
+      # extraction with Claude Haiku.
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      GENERATION_MODEL: "${GENERATION_MODEL}"
+      MODEL_DEVICE: cpu
+      HF_HOME: /hf-cache
+    volumes:
+      # bge model weights download here on first run and persist across restarts.
+      - hf_cache:/hf-cache
+    restart: unless-stopped
 
   # ── FastAPI Placeholder ───────────────────────────────────────────────────────
   api:

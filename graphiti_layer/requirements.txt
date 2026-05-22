@@ -1,0 +1,20 @@
+# Phase 4 — Graphiti + Neo4j layer dependencies.
+#
+# Targets Graphiti's documented stable API (Graphiti, add_episode, search,
+# EpisodeType, AnthropicClient, EmbedderClient, CrossEncoderClient). After the
+# first successful install, pin graphiti-core to the resolved version.
+graphiti-core>=0.3
+# LLM access is via OpenRouter (OpenAI-compatible API) using Graphiti's
+# OpenAIGenericClient, which needs the openai SDK.
+openai>=1.0
+neo4j>=5.0
+pydantic>=2.0
+
+# Local models: bge-m3 (embeddings) + bge-reranker-v2-m3 (cross-encoder).
+sentence-transformers>=3.0
+torch>=2.0
+
+python-dotenv>=1.0
+
+# Test runner for tests/integration/test_phase4_smoke.py.
+pytest>=8.0
