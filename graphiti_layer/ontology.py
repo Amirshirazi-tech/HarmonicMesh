@@ -154,6 +154,62 @@ class Intervention(BaseModel):
     )
 
 
+class AgentAlert(BaseModel):
+    """An alert produced by the Phase 5 LangGraph reasoning agent.
+
+    Reified back into the graph as Layer 2 memory so a future invocation that
+    retrieves history sees not just raw pattern occurrences but the agent's
+    own prior reasoning on similar cascades. Keeps ``reasoning`` (the model's
+    underlying logic, preserved for training) separate from ``summary`` (the
+    <=100-word narrative that becomes the episode text).
+    """
+
+    alert_id: Optional[str] = Field(
+        default=None,
+        description="Unique id for this alert.",
+    )
+    machine_id: Optional[str] = Field(
+        default=None,
+        description="Canonical id of the Machine the alert was raised for.",
+    )
+    pattern_name: Optional[str] = Field(
+        default=None,
+        description="Name of the Pattern the alert is about.",
+    )
+    detected_at: Optional[datetime] = Field(
+        default=None,
+        description="Event-time at which the underlying CEP pattern match closed.",
+    )
+    alerted_at: Optional[datetime] = Field(
+        default=None,
+        description="Wall-clock time at which this alert was emitted.",
+    )
+    severity: Optional[str] = Field(
+        default=None,
+        description="Severity of the alert, e.g. 'CRITICAL'.",
+    )
+    confidence: Optional[float] = Field(
+        default=None,
+        description="Final post-validation confidence in [0,1].",
+    )
+    confidence_raw: Optional[float] = Field(
+        default=None,
+        description="Pre-validation confidence as reported by the LLM in [0,1].",
+    )
+    validation_flags: Optional[list[str]] = Field(
+        default=None,
+        description="Flags raised by validate_confidence, e.g. 'no_anchors'.",
+    )
+    reasoning: Optional[str] = Field(
+        default=None,
+        description="The LLM's underlying logic for the alert, retained for training.",
+    )
+    summary: Optional[str] = Field(
+        default=None,
+        description="<=100-word natural-language episode text written to Graphiti.",
+    )
+
+
 class Outcome(BaseModel):
     """The observed result of an Intervention over an evaluation window."""
 
@@ -196,4 +252,10 @@ ENTITY_TYPES: dict[str, type[BaseModel]] = {
     "PatternOccurrence": PatternOccurrence,
     "Intervention": Intervention,
     "Outcome": Outcome,
+    # NOTE: AgentAlert is deliberately *not* in ENTITY_TYPES. Graphiti's
+    # extraction LLM uses these types to pull structured entities from
+    # episode text; we don't need a structured AgentAlert node — the alert
+    # is reified as an *episode* and discriminated by source_description.
+    # Registering AgentAlert here also collides with Graphiti's reserved
+    # ``summary`` attribute on EntityNode, which would block ingestion.
 }

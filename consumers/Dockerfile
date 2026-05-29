@@ -1,8 +1,9 @@
-# Phase 4 — pattern_ingester service image.
+# Phase 4 + 5 — shared consumer image (pattern_ingester, agent_consumer).
 #
-# Build context is the repo root so both graphiti_layer/ and consumers/ are
+# Build context is the repo root so graphiti_layer/, consumers/ and agent/ are
 # importable. Model weights (bge-m3, bge-reranker-v2-m3) are NOT baked in —
-# they download on first run into the mounted hf_cache volume (HF_HOME).
+# they download on first run into the mounted hf_cache volume (HF_HOME). The
+# image carries both consumers; docker-compose picks which CMD to run per service.
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -24,5 +25,6 @@ RUN pip install --no-cache-dir \
 
 COPY graphiti_layer/ /app/graphiti_layer/
 COPY consumers/ /app/consumers/
+COPY agent/ /app/agent/
 
 CMD ["python", "-m", "consumers.pattern_ingester"]

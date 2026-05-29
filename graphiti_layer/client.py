@@ -93,6 +93,12 @@ class Episode(BaseModel):
         "Differs from the post-rerank order whenever the cross-encoder moved "
         "this candidate."
     )
+    episode_type: Optional[str] = Field(
+        default=None,
+        description="Logical kind of source episode (pattern_occurrence, "
+        "intervention, outcome, agent_alert) — None when the source episode "
+        "could not be resolved.",
+    )
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Provenance (edge uuid, source episodes)."
     )

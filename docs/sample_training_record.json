@@ -1,0 +1,152 @@
+{
+  "record_id": "hm-train-machine-03-a581598c9df6",
+  "schema_version": "1.0",
+  "machine_id": "Machine-03",
+  "pattern_name": "ThermalVibrationCascade",
+  "detected_at": "2026-01-01T00:07:17.658000Z",
+  "alerted_at": "2026-05-29T18:13:15.777406Z",
+  "pattern_match": {
+    "machine_id": "Machine-03",
+    "pattern_name": "ThermalVibrationCascade",
+    "severity": "CRITICAL",
+    "detected_at": "2026-01-01T00:07:17.658000+00:00",
+    "source_events": [
+      {
+        "machine_id": "Machine-03",
+        "machine_type": "rolling_mill",
+        "event_time": "2026-01-01T00:07:13.637Z",
+        "event_type": "telemetry",
+        "sensors": {
+          "temperature_c": 424.3752,
+          "vibration_rms_mm_s": 5.3999,
+          "current_a": 466.3674,
+          "duty_cycle_pct": 91.7857
+        },
+        "meta": {
+          "sim_seed": 42,
+          "injected_fault": "thermal_vibration_cascade"
+        }
+      },
+      {
+        "machine_id": "Machine-03",
+        "machine_type": "rolling_mill",
+        "event_time": "2026-01-01T00:07:14.641Z",
+        "event_type": "telemetry",
+        "sensors": {
+          "temperature_c": 419.9985,
+          "vibration_rms_mm_s": 5.2273,
+          "current_a": 459.4546,
+          "duty_cycle_pct": 80.8184
+        },
+        "meta": {
+          "sim_seed": 42,
+          "injected_fault": "thermal_vibration_cascade"
+        }
+      },
+      {
+        "machine_id": "Machine-03",
+        "machine_type": "rolling_mill",
+        "event_time": "2026-01-01T00:07:17.658Z",
+        "event_type": "telemetry",
+        "sensors": {
+          "temperature_c": 422.3998,
+          "vibration_rms_mm_s": 5.3829,
+          "current_a": 515.8546,
+          "duty_cycle_pct": 85.7733
+        },
+        "meta": {
+          "sim_seed": 42,
+          "injected_fault": "thermal_vibration_cascade"
+        }
+      }
+    ]
+  },
+  "retrieved_episodes": [
+    {
+      "name": "DETECTED_ON",
+      "content": "The ThermalVibrationCascade pattern was detected on Machine-03 with peak sensor readings of temperature 424.4 \u00b0C, vibration RMS 5.40 mm/s, and current draw 515.9 A",
+      "episode_type": "pattern_occurrence",
+      "occurred_at": "2026-01-01T00:07:17.658000+00:00",
+      "reranker_score": 0.9998088479042053,
+      "retrieval_rank": 0,
+      "metadata": {
+        "edge_uuid": "ce369eb5-8354-4de9-82a9-96d09d69df87",
+        "source_episode_uuids": [
+          "2d2d0ddd-7283-43b6-97a1-dfea0ddb76cb"
+        ]
+      }
+    },
+    {
+      "name": "EXPERIENCED_PATTERN",
+      "content": "Machine-03 experienced a ThermalVibrationCascade pattern cascade that developed over 3 seconds beginning 2026-01-01T00:13:39.530Z, with peak sensor readings of temperature 424.4 \u00b0C, vibration RMS 5.47 mm/s, and current draw 496.3 A.",
+      "episode_type": "pattern_occurrence",
+      "occurred_at": "2026-01-01T00:13:39.530000+00:00",
+      "reranker_score": 0.999314546585083,
+      "retrieval_rank": 4,
+      "metadata": {
+        "edge_uuid": "4cf08602-218a-4348-91fc-50a377a70695",
+        "source_episode_uuids": [
+          "c6deb542-25e7-4f5d-88ab-0bcdd5b92321"
+        ]
+      }
+    },
+    {
+      "name": "DETECTED_ON",
+      "content": "The ThermalVibrationCascade pattern was detected on Machine-03 with CRITICAL severity, with peak sensor readings of temperature 422.4 \u00b0C, vibration RMS 5.15 mm/s, and current draw 515.4 A.",
+      "episode_type": "pattern_occurrence",
+      "occurred_at": "2026-01-01T00:08:04.855000+00:00",
+      "reranker_score": 0.9983916878700256,
+      "retrieval_rank": 8,
+      "metadata": {
+        "edge_uuid": "0c9cfd5a-53f5-49f1-a57d-5c34c26946f2",
+        "source_episode_uuids": [
+          "ba77f697-ae33-4e60-99ea-025de8f692f0"
+        ]
+      }
+    },
+    {
+      "name": "DETECTED_ON",
+      "content": "The ThermalVibrationCascade pattern was detected on Machine-03, a rolling mill, with peak sensor readings during the cascade of temperature 422.8 \u00b0C, vibration RMS 5.44 mm/s, and current draw 513.4 A.",
+      "episode_type": "pattern_occurrence",
+      "occurred_at": "2026-01-01T00:15:35.206000+00:00",
+      "reranker_score": 0.9957922697067261,
+      "retrieval_rank": 27,
+      "metadata": {
+        "edge_uuid": "9a736f70-a62a-40be-b901-255c62754928",
+        "source_episode_uuids": [
+          "8522b74e-6290-4eee-864f-0d411eda121f"
+        ]
+      }
+    },
+    {
+      "name": "DETECTED_WITH",
+      "content": "ThermalVibrationCascade pattern was detected on Machine-03 with confidence 0.78 and CRITICAL severity, with temperature reaching 426\u00b0C, vibration RMS 5.25 mm/s, and current draw 507.5 A.",
+      "episode_type": "agent_alert",
+      "occurred_at": "2026-01-01T00:07:00.586000+00:00",
+      "reranker_score": 0.9840203523635864,
+      "retrieval_rank": 29,
+      "metadata": {
+        "edge_uuid": "c9dd17ad-41ba-4fc6-96fd-85bf48ca76c4",
+        "source_episode_uuids": [
+          "7900ea71-9f02-4d7d-8c06-417343401789"
+        ]
+      }
+    }
+  ],
+  "reasoning": "Machine-03 has experienced the ThermalVibrationCascade pattern repeatedly within a narrow time window on 2026-01-01, with four documented occurrences showing consistent peak signatures. The current match at 00:07:17 aligns precisely with historical detections at 00:07:17, 00:08:04, 00:13:39, and 00:15:35, all exhibiting temperature in the 422\u2013426 \u00b0C range, vibration RMS between 5.15\u20135.47 mm/s, and current draw between 496\u2013515 A. This recurrence pattern on the same machine with identical sensor cascade characteristics indicates a systematic, reproducible failure mode rather than a transient anomaly.",
+  "confidence_anchors": [
+    "Prior ThermalVibrationCascade detection on Machine-03 at 2026-01-01T00:07:17.658Z with peak temperature 424.4 \u00b0C, vibration RMS 5.40 mm/s, current 515.9 A\u2014exact match to current pattern",
+    "Second occurrence at 2026-01-01T00:08:04.855Z with CRITICAL severity, temperature 422.4 \u00b0C, vibration RMS 5.15 mm/s, current 515.4 A",
+    "Third occurrence at 2026-01-01T00:13:39.530Z with temperature 424.4 \u00b0C, vibration RMS 5.47 mm/s, current 496.3 A over 3-second cascade window",
+    "Fourth occurrence at 2026-01-01T00:15:35.206Z with temperature 422.8 \u00b0C, vibration RMS 5.44 mm/s, current 513.4 A",
+    "Prior alert at 2026-01-01T00:07:00.586Z documented confidence 0.78 for identical pattern with temperature 426 \u00b0C, vibration RMS 5.25 mm/s, current 507.5 A"
+  ],
+  "confidence_raw": 0.92,
+  "confidence_final": 0.8,
+  "validation_flags": [
+    "missing_outcome_for_tier"
+  ],
+  "alert_text": "CRITICAL: ThermalVibrationCascade pattern confirmed on Machine-03 (rolling mill) with temperature 424.4 \u00b0C, vibration 5.40 mm/s RMS, and current draw 515.9 A. This is the fourth occurrence of this exact cascade signature within 8 minutes, indicating a persistent thermal-mechanical coupling failure. Recommend immediate inspection of bearing assembly and lubrication system, followed by thermal imaging to identify localized heat sources.",
+  "model": "anthropic/claude-haiku-4-5",
+  "outcome_id": null
+}

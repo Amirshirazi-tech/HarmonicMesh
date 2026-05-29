@@ -9,7 +9,7 @@ volumes:
   neo4j_data:
   neo4j_logs:
   mlflow_data:
-  hf_cache:        # HuggingFace model cache for the pattern_ingester (bge models)
+  hf_cache:        # HuggingFace model cache shared by pattern_ingester and agent_consumer (bge models)
 
 services:
 
@@ -206,6 +206,41 @@ services:
     volumes:
       # bge model weights download here on first run and persist across restarts.
       - hf_cache:/hf-cache
+    restart: unless-stopped
+
+  # ── Agent Consumer (Phase 5: LangGraph reasoning agent) ─────────────────────
+  # Subscribes to harmonicmesh.patterns.machine-03, compiles the LangGraph once
+  # at startup, then invokes it on every message. Publishes alerts to
+  # harmonicmesh.alerts.<machine-id>, reifies alerts back into Graphiti, and
+  # appends SovereignMesh training records to ./training_data/harmonicmesh/.
+  agent-consumer:
+    build:
+      context: .
+      dockerfile: consumers/Dockerfile
+    container_name: harmonicmesh-agent-consumer
+    networks:
+      - harmonicmeshnet
+    depends_on:
+      kafka:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD}"
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD}"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      GENERATION_MODEL: "${GENERATION_MODEL}"
+      TRAINING_DATA_DIR: /training_data/harmonicmesh
+      MODEL_DEVICE: cpu
+      HF_HOME: /hf-cache
+    volumes:
+      - hf_cache:/hf-cache
+      - ./training_data/harmonicmesh:/training_data/harmonicmesh
+    command: ["python", "-m", "consumers.agent_consumer"]
     restart: unless-stopped
 
   # ── FastAPI Placeholder ───────────────────────────────────────────────────────

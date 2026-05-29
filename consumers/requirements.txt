@@ -1,5 +1,9 @@
-# Phase 4 — pattern_ingester consumer dependencies.
+# Phase 4 + 5 — consumer dependencies (pattern_ingester, agent_consumer).
 # Inherits the Graphiti layer requirements (resolved relative to this file).
 -r ../graphiti_layer/requirements.txt
 
 confluent-kafka>=2.9.0
+
+# Phase 5 — LangGraph agent runtime.
+langgraph>=0.2.0
+httpx>=0.27.0
