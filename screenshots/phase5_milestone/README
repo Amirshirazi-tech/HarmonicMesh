@@ -1,0 +1,42 @@
+# Phase 5 — Two-Layer Memory Verification
+
+This screenshot was captured after Phase 5 end-to-end verification, when
+the LangGraph reasoning agent had begun consuming pattern matches and
+reifying its alerts back into Graphiti as a second layer of memory.
+
+At capture time the system had produced:
+- 8 contextual alerts emitted to the Kafka alerts topic
+- 7 agent_alert episodes reified into Graphiti
+- 8 training records written to JSONL for SovereignMesh
+- Validation gate active: 3 of 8 records had confidence downgraded
+  (raw mean 0.83 → final mean 0.79)
+- All alerts grounded in ≥3 specific anchors quoted from retrieved
+  historical episodes
+
+## machine03_with_alerts.png
+
+Memory graph for Machine-03 showing both episode types coexisting around
+the same physical machine:
+
+- ThermalVibrationCascade episodes — Layer 1 (facts detected by CEP)
+- AgentAlert episodes — Layer 2 (interpretations produced by the agent's
+  reasoning, reified back into the graph as new memory)
+
+This is the architectural claim of HarmonicMesh rendered as a single
+image: memory has two layers, and both layers connect to the same
+physical entity they describe.
+
+Cypher query used:
+
+```cypher
+MATCH (m:Machine {name: "Machine-03"})<-[r:MENTIONS]-(e:Episodic)
+WHERE e.source_description IN ["HarmonicMesh CEP pattern match",
+                                "HarmonicMesh agent alert"]
+RETURN m, e, r
+LIMIT 30
+```
+
+The agent's own prior alerts become retrievable context for future
+reasoning cycles. During the test run, the agent successfully retrieved
+one of its own earlier alerts and cited it as evidence in a subsequent
+cascade — the Layer 2 memory feedback loop working in practice.
