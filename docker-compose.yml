@@ -243,6 +243,47 @@ services:
     command: ["python", "-m", "consumers.agent_consumer"]
     restart: unless-stopped
 
+  # ── EDI Simulator (Phase 6) ──────────────────────────────────────────────────
+  # Produces synthetic EDI order/shipment/invoice events to harmonicmesh.edi.events.
+  # ~10 transactions per simulated hour; ~3 violations per simulated hour by default.
+  #
+  # Flink job submission (run once after the stack is up and the JAR is rebuilt):
+  #
+  #   # Pattern 2 — Missing Heartbeat:
+  #   docker cp flink_jobs/java/target/harmonicmesh-cep-1.0-SNAPSHOT.jar \
+  #             harmonicmesh-flink-jm:/tmp/harmonicmesh-cep.jar
+  #   docker compose exec flink-jobmanager flink run \
+  #     -c com.harmonicmesh.MissingHeartbeatJob \
+  #     /tmp/harmonicmesh-cep.jar
+  #
+  #   # Pattern 3 — EDI Sequence Violation:
+  #   docker compose exec flink-jobmanager flink run \
+  #     -c com.harmonicmesh.EDISequenceViolationJob \
+  #     /tmp/harmonicmesh-cep.jar
+  #
+  # (Pattern 1 — ThermalVibrationCascade — still uses the default mainClass):
+  #   docker compose exec flink-jobmanager flink run /tmp/harmonicmesh-cep.jar
+  edi-simulator:
+    build:
+      context: .
+      dockerfile: simulators/Dockerfile
+    container_name: harmonicmesh-edi-simulator
+    networks:
+      - harmonicmeshnet
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD}"
+    command: >
+      python -m simulators.edi_simulator
+        --compression 1
+        --duration 90d
+        --sim-start 2026-01-01T00:00:00Z
+    restart: unless-stopped
+
   # ── FastAPI Placeholder ───────────────────────────────────────────────────────
   api:
     build:

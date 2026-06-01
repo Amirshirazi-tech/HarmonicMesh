@@ -1,1 +1,2 @@
-# Phase 6: EDI process simulator implementation.
+# Phase 6: EDI event simulator — produces synthetic order/shipment/invoice
+# events to harmonicmesh.edi.events for EDISequenceViolation detection.

@@ -25,10 +25,19 @@ KAFKA_CONTAINER="${KAFKA_CONTAINER:-harmonicmesh-kafka}"
 # is unreachable from within the container network.
 BOOTSTRAP="${KAFKA_BOOTSTRAP:-kafka:29092}"
 
-# Pattern topics that must have infinite retention. Created if absent so the
-# setting is in place before the CEP job writes its first match.
+# Topics that must have infinite retention — any topic carrying records stamped
+# with *simulated* event-time (which is often far in the past under time-
+# compression).  This includes pattern output topics AND source topics whose
+# producers use simulated event-time (e.g. harmonicmesh.edi.events).
+#
+# Rule: add a topic here whenever its Kafka message timestamps are set from
+# SimulationClock (not wall-clock).  Sensor topics are excluded because the
+# machine simulator writes them with wall-clock-aligned event times.
 PATTERN_TOPICS=(
   harmonicmesh.patterns.machine-03
+  harmonicmesh.patterns.machine-04
+  harmonicmesh.patterns.edi
+  harmonicmesh.edi.events
 )
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

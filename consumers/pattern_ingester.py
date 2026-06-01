@@ -1,7 +1,8 @@
 """Pattern-match → Graphiti ingestion consumer.
 
-A long-lived Kafka consumer subscribed to ``harmonicmesh.patterns.machine-03``.
-Each Flink CEP pattern match is handed to ``graphiti_layer.ingest_pattern_match``
+A long-lived Kafka consumer subscribed to all ``harmonicmesh.patterns.*`` topics
+via a regex subscription.  Each Flink CEP pattern match is handed to
+``graphiti_layer.ingest_pattern_match``
 and the offset is committed only after the Graphiti write succeeds — so a crash
 mid-ingest replays the message rather than dropping it (at-least-once).
 
@@ -34,7 +35,9 @@ logging.basicConfig(
 )
 log = logging.getLogger("pattern_ingester")
 
-TOPIC = "harmonicmesh.patterns.machine-03"
+# Regex matches all current and future pattern topics regardless of machine or
+# pattern type.  rdkafka interprets topics starting with '^' as regex.
+TOPICS_PATTERN = "^harmonicmesh\\.patterns\\..+"
 CONSUMER_GROUP = "harmonicmesh-graphiti-ingester"
 RETRY_BACKOFF_SECONDS = 5.0
 POLL_TIMEOUT_SECONDS = 1.0
@@ -112,8 +115,8 @@ async def run() -> None:
     await get_graphiti()
 
     consumer = _build_consumer()
-    consumer.subscribe([TOPIC])
-    log.info("Subscribed to %s; consuming...", TOPIC)
+    consumer.subscribe([TOPICS_PATTERN])
+    log.info("Subscribed via pattern %s; consuming...", TOPICS_PATTERN)
 
     try:
         while not stop.is_set():

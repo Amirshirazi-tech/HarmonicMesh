@@ -20,9 +20,11 @@ from .ontology import Intervention
 # extraction quality downstream.
 MAX_EPISODE_WORDS = 100
 
-# Maps a pattern name to its family. New CEP patterns (Phase 6) add an entry.
+# Maps a pattern name to its family. New CEP patterns add an entry here.
 _PATTERN_FAMILY: dict[str, str] = {
     "ThermalVibrationCascade": "bearing_degradation",
+    "MissingHeartbeat":        "connectivity_failure",
+    "EDISequenceViolation":    "edi_compliance",
 }
 
 
@@ -55,22 +57,34 @@ def _check_length(text: str) -> str:
 def format_pattern_match_episode(pattern_match_json: dict) -> str:
     """Render a Flink CEP pattern-match event as a natural-language episode.
 
-    Computes peak sensor values across the match's source events and the
-    cascade duration (event-time span from the first to the last source event),
-    then produces a <=100-word narrative referencing the canonical Machine,
-    Pattern and PatternOccurrence so Graphiti can extract all three.
+    Dispatches to a pattern-specific formatter based on ``pattern_name``.
+    All formatters produce a <=100-word narrative referencing the canonical
+    Machine, Pattern and PatternOccurrence so Graphiti can extract them.
 
     Raises:
-        ValueError: the pattern match is missing required fields or is empty —
-            treated as a poison message by the consumer.
+        ValueError: the pattern match is missing required fields — treated as
+            a poison message by the consumer.
     """
     try:
         pattern_name = pattern_match_json["pattern_name"]
-        machine_id = pattern_match_json["machine_id"]
-        detected_at = pattern_match_json["detected_at"]
-        events = pattern_match_json["source_events"]
+        pattern_match_json["machine_id"]
+        pattern_match_json["detected_at"]
     except KeyError as exc:
         raise ValueError(f"pattern match missing required field: {exc}") from exc
+
+    if pattern_name == "MissingHeartbeat":
+        return _format_missing_heartbeat(pattern_match_json)
+    if pattern_name == "EDISequenceViolation":
+        return _format_edi_violation(pattern_match_json)
+    return _format_sensor_cascade(pattern_match_json)
+
+
+def _format_sensor_cascade(pattern_match_json: dict) -> str:
+    """Original ThermalVibrationCascade formatter — requires sensor data in source_events."""
+    pattern_name = pattern_match_json["pattern_name"]
+    machine_id = pattern_match_json["machine_id"]
+    detected_at = pattern_match_json["detected_at"]
+    events = pattern_match_json["source_events"]
 
     if not events:
         raise ValueError("pattern match has no source_events")
@@ -99,6 +113,52 @@ def format_pattern_match_episode(pattern_match_json: dict) -> str:
         f"over {duration_s:.0f} seconds, beginning {start_iso}. Peak sensor "
         f"readings during the cascade were temperature {peak_temp:.1f} °C, "
         f"vibration RMS {peak_vib:.2f} mm/s, and current draw {peak_cur:.1f} A."
+    )
+    return _check_length(text)
+
+
+def _format_missing_heartbeat(pattern_match_json: dict) -> str:
+    """Formatter for Phase 6 MissingHeartbeat pattern."""
+    machine_id  = pattern_match_json["machine_id"]
+    detected_at = pattern_match_json["detected_at"]
+    events      = pattern_match_json.get("source_events", [])
+    severity    = pattern_match_json.get("severity", "CRITICAL")
+    family      = _PATTERN_FAMILY["MissingHeartbeat"]
+
+    occ_id = occurrence_id(machine_id, detected_at)
+    last_hb_time = events[0].get("event_time", "unknown") if events else "unknown"
+    last_seq     = events[0].get("sequence", "?") if events else "?"
+
+    text = (
+        f"Pattern occurrence {occ_id}: the MissingHeartbeat pattern "
+        f"(family {family}) was detected on {machine_id} at {detected_at} "
+        f"with {severity} severity. The last heartbeat was received at "
+        f"{last_hb_time} (sequence {last_seq}). Absence of heartbeats "
+        f"indicates a potential connectivity or power failure."
+    )
+    return _check_length(text)
+
+
+def _format_edi_violation(pattern_match_json: dict) -> str:
+    """Formatter for Phase 6 EDISequenceViolation pattern."""
+    machine_id     = pattern_match_json["machine_id"]
+    detected_at    = pattern_match_json["detected_at"]
+    events         = pattern_match_json.get("source_events", [])
+    severity       = pattern_match_json.get("severity", "HIGH")
+    violation_type = pattern_match_json.get("violation_type", "unknown")
+    family         = _PATTERN_FAMILY["EDISequenceViolation"]
+
+    occ_id = occurrence_id(machine_id, detected_at)
+    order_ids = list({e.get("order_id", "") for e in events if e.get("order_id")})
+    order_id_str = order_ids[0] if order_ids else "unknown"
+    event_types  = [e.get("event_type", "?") for e in events]
+
+    text = (
+        f"Pattern occurrence {occ_id}: the EDISequenceViolation pattern "
+        f"(family {family}) was detected at {detected_at} with {severity} "
+        f"severity. Violation type: {violation_type}. Affected order: "
+        f"{order_id_str}. Involved EDI message types: "
+        f"{', '.join(event_types)}."
     )
     return _check_length(text)
 

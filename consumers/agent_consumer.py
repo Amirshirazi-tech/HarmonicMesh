@@ -1,6 +1,7 @@
 """Reactive Kafka consumer for the Phase 5 LangGraph reasoning agent.
 
-A long-lived Kafka consumer subscribed to ``harmonicmesh.patterns.machine-03``.
+A long-lived Kafka consumer subscribed to all ``harmonicmesh.patterns.*`` topics
+via a regex subscription.
 The LangGraph is compiled **once** at startup and reused for the lifetime of
 the process — never re-compiled per message.
 
@@ -35,7 +36,9 @@ logging.basicConfig(
 )
 log = logging.getLogger("agent_consumer")
 
-TOPIC = "harmonicmesh.patterns.machine-03"
+# Regex matches all current and future pattern topics regardless of machine or
+# pattern type.  rdkafka interprets topics starting with '^' as regex.
+TOPICS_PATTERN = "^harmonicmesh\\.patterns\\..+"
 CONSUMER_GROUP = "harmonicmesh-agent"
 INITIAL_BACKOFF_SECONDS = 2.0
 MAX_BACKOFF_SECONDS = 60.0
@@ -139,8 +142,8 @@ async def run() -> None:
     log.info("Agent compiled.")
 
     consumer = _build_consumer()
-    consumer.subscribe([TOPIC])
-    log.info("Subscribed to %s; consuming...", TOPIC)
+    consumer.subscribe([TOPICS_PATTERN])
+    log.info("Subscribed via pattern %s; consuming...", TOPICS_PATTERN)
 
     backoff = _BackoffState()
     try:

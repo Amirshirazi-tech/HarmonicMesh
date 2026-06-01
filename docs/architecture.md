@@ -7,23 +7,29 @@ No CEP job writes directly to Graphiti — all writes go through the agent.
 
 ## Kafka topic retention
 
-Pattern topics (`harmonicmesh.patterns.*`) use **infinite retention** (`retention.ms=-1`).
+**Rule: any Kafka topic whose records are stamped with *simulated* event-time
+(i.e. from `SimulationClock.now()`) needs `retention.ms=-1` (infinite), regardless
+of whether it is a source or a sink topic.**
 
-Flink's `KafkaSink` stamps each CEP match with the *event-time of the match* — which is
-*simulated* time, often far in the past under time-compression (and especially the 90-day
-warm-up history). Kafka's retention thread compares message timestamps against wall-clock
-`now`, so with the default 7-day retention it treats freshly written matches as already
-expired and deletes them within minutes.
+Kafka's retention thread compares message timestamps against wall-clock `now`.  Under
+time-compression (and especially the 90-day warm-up history), simulated event-times are
+far in the past.  With the default 7-day retention, the broker treats freshly written
+records as already expired and deletes them within minutes of arrival.
 
-Apply the setting after `docker compose up` with the idempotent
-`scripts/configure_kafka_topics.sh`.
+Topics affected:
 
-This override is scoped to `harmonicmesh.patterns.*` only. Ingest topics
-(`harmonicmesh.sensors.*`, `harmonicmesh.heartbeats.*`, `harmonicmesh.edi.*`) keep the
-default retention — they carry a steady stream of fresh, wall-clock-aligned records.
+| Topic | Role | Reason |
+|---|---|---|
+| `harmonicmesh.patterns.*` | CEP output | Flink stamps matches with the match's event-time |
+| `harmonicmesh.edi.events` | EDI simulator output | `SimulationClock`-stamped event-time |
 
-This is a Kafka topic-configuration concern only; the Flink CEP job and the simulator are
-deliberately left unchanged.
+Topics **not** affected:
+- `harmonicmesh.sensors.*` — machine simulator writes wall-clock-aligned event times
+- `harmonicmesh.heartbeats.*` — same
+
+Apply with the idempotent `scripts/configure_kafka_topics.sh` after `docker compose up`.
+The script's `PATTERN_TOPICS` array lists all topics that need this setting; add to it
+whenever a new simulated-time topic is introduced.
 
 ## Episode-type discrimination in Graphiti
 

@@ -30,23 +30,33 @@ Flink mini-cluster fed by `fromCollection(...)` — no Kafka required.
 
 ## Submit to the cluster
 
-The JobManager and TaskManager containers need Kafka SASL credentials in
-their environment. The current `docker-compose.yml` does NOT pipe these
-through. Either:
+The `docker-compose.yml` already pipes `KAFKA_SASL_USERNAME` and
+`KAFKA_SASL_PASSWORD` into the Flink services.  Rebuild the JAR first, then
+copy and submit:
 
-1. Extend `docker-compose.yml` to add `KAFKA_SASL_USERNAME` /
-   `KAFKA_SASL_PASSWORD` to the Flink services' `environment` block, then
-   `docker compose up -d`.
-2. Or pass them ad-hoc when running the submit command.
-
-Then:
-
-    docker compose up -d
+    mvn -f flink_jobs/java/pom.xml clean package
     docker cp flink_jobs/java/target/harmonicmesh-cep-1.0-SNAPSHOT.jar \
               harmonicmesh-flink-jm:/tmp/harmonicmesh-cep.jar
+
+### Pattern 1 — ThermalVibrationCascade (default mainClass)
+
     docker compose exec flink-jobmanager flink run \
-        -c com.harmonicmesh.cep.ThermalVibrationCascadeJob \
         /tmp/harmonicmesh-cep.jar
+
+### Pattern 2 — MissingHeartbeat
+
+    docker compose exec flink-jobmanager flink run \
+        -c com.harmonicmesh.MissingHeartbeatJob \
+        /tmp/harmonicmesh-cep.jar
+
+### Pattern 3 — EDISequenceViolation
+
+    docker compose exec flink-jobmanager flink run \
+        -c com.harmonicmesh.EDISequenceViolationJob \
+        /tmp/harmonicmesh-cep.jar
+
+All three jobs can run concurrently in the same cluster; each uses a distinct
+consumer group ID and writes to a separate sink topic.
 
 ## Configuration
 
