@@ -186,6 +186,16 @@ This is a local development stack; do not expose ports to the public internet.
 
 ---
 
+## Built with Claude Code
+
+This project was implemented with Claude Code, Anthropic's coding agent, working in a
+delegated mode. I owned the architecture — making the design decisions, directing the work,
+and verifying every component end-to-end — while Claude Code wrote the code from directive
+prompts. The experience underlined a shift worth naming: as coding agents grow more capable,
+the binding constraint moves from typing to judgment.
+
+---
+
 ## Attribution
 
 The CEP architecture follows principles from Kai Waehner's April 2026 article
