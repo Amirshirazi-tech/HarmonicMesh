@@ -5,7 +5,7 @@ Docker compose cluster (Flink 1.19, see `docker-compose.yml`).
 
 The Python CEP API does not exist in any released PyFlink version. All CEP
 work in this project lives here, in Java. Other phases (machine simulator,
-LangGraph agent, Plotly dashboard) remain Python.
+LangGraph agent) remain Python.
 
 ## Prerequisites
 

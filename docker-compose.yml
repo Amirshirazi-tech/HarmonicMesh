@@ -8,7 +8,6 @@ volumes:
   kafka_data:
   neo4j_data:
   neo4j_logs:
-  mlflow_data:
   hf_cache:        # HuggingFace model cache shared by pattern_ingester and agent_consumer (bge models)
 
 services:
@@ -154,25 +153,6 @@ services:
         parallelism.default: 1
         state.backend: filesystem
         state.checkpoints.dir: file:///tmp/flink-checkpoints
-
-  # ── MLflow Tracking Server ────────────────────────────────────────────────────
-  mlflow:
-    build:
-      context: ./mlflow
-      dockerfile: Dockerfile
-    container_name: harmonicmesh-mlflow
-    networks:
-      - harmonicmeshnet
-    ports:
-      - "5000:5000"
-    volumes:
-      - mlflow_data:/mlflow
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
 
   # ── Pattern Ingester (Phase 4: Kafka → Graphiti) ─────────────────────────────
   # Reactive consumer: reads CEP pattern matches from

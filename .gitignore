@@ -30,8 +30,6 @@ training_data/harmonicmesh/
 .DS_Store
 Thumbs.db
 
-# MLflow run artifacts (local)
-mlruns/
 /repotClaud.txt
 /CLAUDE.md
 /explanationPhase3.txt

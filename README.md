@@ -44,7 +44,7 @@ cp secrets/kafka_server_jaas.conf.example secrets/kafka_server_jaas.conf
 docker compose up -d
 ```
 
-The first run pulls images and builds the `api` and `mlflow` containers — allow 5–10 minutes.
+The first run pulls images and builds the `api` container — allow 5–10 minutes.
 Subsequent starts are fast.
 
 ### 3. Verify all UIs are reachable
@@ -54,7 +54,6 @@ Subsequent starts are fast.
 | Kafka UI | http://localhost:8180 | admin / `KAFKA_UI_PASSWORD` from `.env` |
 | Neo4j Browser | http://localhost:7474 | neo4j / `NEO4J_PASSWORD` from `.env` |
 | Flink JobManager | http://localhost:8181 | — |
-| MLflow | http://localhost:5000 | — |
 | FastAPI health | http://localhost:8001/health | — |
 
 Wait ~60 seconds after `docker compose up` for Neo4j and Flink to finish initializing.
@@ -99,7 +98,6 @@ docker compose down -v       # stop and delete all data volumes (full reset)
 | Neo4j Community 5 | neo4j:5-community | 7474, 7687 |
 | Flink JobManager | flink:1.19-scala_2.12-java11 | 8181 |
 | Flink TaskManager | flink:1.19-scala_2.12-java11 | — |
-| MLflow | python:3.11-slim + mlflow | 5000 |
 | FastAPI | python:3.11-slim + fastapi | 8001 |
 
 All services share the `harmonicmeshnet` Docker network.
@@ -139,8 +137,6 @@ harmonicmesh/
 ├── agent/                   # Phase 5 — LangGraph reactive consumer
 ├── graphiti_layer/          # Phase 4 — Graphiti + Neo4j
 ├── api/                     # Phase 1 — FastAPI (health + alerts)
-├── dashboard/               # Phase 7 — Plotly Dash
-├── mlflow/                  # MLflow Dockerfile + tracking config
 ├── training_data/           # SovereignMesh JSONL exports (gitignored)
 ├── scripts/
 │   ├── run_warmup.sh        # 90-day compressed warm-up (Phase 5+)

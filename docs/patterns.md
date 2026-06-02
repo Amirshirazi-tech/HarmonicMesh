@@ -10,7 +10,7 @@ Three v1 patterns, one per CEP surface:
 
 > **Note on language.** The Pattern API is implemented in **Java**, not
 > Python — PyFlink does not expose CEP bindings in any released version.
-> The rest of the project (machine simulator, agent, dashboard) remains
+> The rest of the project (machine simulator, agent) remains
 > Python; only Flink CEP code lives under `flink_jobs/java/`.
 
 ---
