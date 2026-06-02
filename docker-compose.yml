@@ -192,7 +192,7 @@ services:
   # Subscribes to harmonicmesh.patterns.machine-03, compiles the LangGraph once
   # at startup, then invokes it on every message. Publishes alerts to
   # harmonicmesh.alerts.<machine-id>, reifies alerts back into Graphiti, and
-  # appends SovereignMesh training records to ./training_data/harmonicmesh/.
+  # appends downstream training records to ./training_data/harmonicmesh/.
   agent-consumer:
     build:
       context: .

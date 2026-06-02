@@ -1,4 +1,4 @@
-"""Node: append one TrainingRecord JSONL row for SovereignMesh."""
+"""Node: append one TrainingRecord JSONL row for the downstream training pipeline."""
 from __future__ import annotations
 
 import logging

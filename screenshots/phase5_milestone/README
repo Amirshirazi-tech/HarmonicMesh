@@ -7,7 +7,7 @@ reifying its alerts back into Graphiti as a second layer of memory.
 At capture time the system had produced:
 - 8 contextual alerts emitted to the Kafka alerts topic
 - 7 agent_alert episodes reified into Graphiti
-- 8 training records written to JSONL for SovereignMesh
+- 8 training records written to JSONL for the downstream training pipeline
 - Validation gate active: 3 of 8 records had confidence downgraded
   (raw mean 0.83 → final mean 0.79)
 - All alerts grounded in ≥3 specific anchors quoted from retrieved

@@ -3,8 +3,6 @@
 Real-time failure pattern detection with temporal memory for industrial operations.
 Flink CEP detects recurring signatures; Graphiti remembers them.
 
-**Portfolio sequence:** CausalMesh → **HarmonicMesh** → SovereignMesh → Agent Mesh
-
 ---
 
 ## Quick Start
@@ -101,7 +99,7 @@ docker compose down -v       # stop and delete all data volumes (full reset)
 | FastAPI | python:3.11-slim + fastapi | 8001 |
 
 All services share the `harmonicmeshnet` Docker network.
-Ports are offset +100 from CausalMesh so both stacks can run simultaneously on the same host.
+Ports are offset +100 from a sibling stack so both can run simultaneously on the same host.
 
 ### Kafka topics (created in Phase 2+)
 
@@ -110,7 +108,7 @@ harmonicmesh.sensors.<machine-id>    # raw sensor telemetry
 harmonicmesh.edi.<partner-code>      # EDI process messages
 harmonicmesh.patterns.<machine-id>   # Flink CEP pattern matches
 harmonicmesh.alerts.<machine-id>     # agent-generated alerts
-harmonicmesh.training_records        # SovereignMesh training data (v2)
+harmonicmesh.training_records        # downstream training data (v2)
 ```
 
 ---
@@ -132,12 +130,12 @@ harmonicmesh/
 │   ├── machine_simulator/   # Phase 2
 │   └── edi_simulator/       # Phase 6
 ├── flink_jobs/
-│   ├── python/              # Phase 3 — Pattern API
+│   ├── java/                # Phase 3 — CEP Pattern API (Java)
 │   └── sql/                 # Phase 6 — MATCH_RECOGNIZE + LEFT JOIN
 ├── agent/                   # Phase 5 — LangGraph reactive consumer
 ├── graphiti_layer/          # Phase 4 — Graphiti + Neo4j
 ├── api/                     # Phase 1 — FastAPI (health + alerts)
-├── training_data/           # SovereignMesh JSONL exports (gitignored)
+├── training_data/           # downstream training-pipeline JSONL exports (gitignored)
 ├── scripts/
 │   ├── run_warmup.sh        # 90-day compressed warm-up (Phase 5+)
 │   ├── run_demo.sh          # live demo from snapshot (Phase 5+)

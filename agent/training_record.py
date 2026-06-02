@@ -1,8 +1,8 @@
-"""Training-record model and JSONL writer for SovereignMesh export.
+"""Training-record model and JSONL writer for the downstream training-pipeline export.
 
 The Phase 5 agent's ``emit_training_record`` node serialises one record per
-alert into ``./training_data/harmonicmesh/{YYYY-MM-DD}.jsonl``. SovereignMesh
-later reads the same file to train downstream models.
+alert into ``./training_data/harmonicmesh/{YYYY-MM-DD}.jsonl``. A downstream
+training pipeline later reads the same file to train models.
 
 ``outcome_id`` is reserved for the deferred-grading job that will backfill
 the field once a maintenance Outcome arrives; v1 always writes ``None``.
