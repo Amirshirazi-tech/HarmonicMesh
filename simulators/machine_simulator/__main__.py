@@ -202,7 +202,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     # ----------------------------------------------------------------- Kafka
     kafka_bootstrap = args.kafka_bootstrap
     sasl_username = os.environ.get("KAFKA_SASL_USERNAME", "harmonicmesh")
-    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD", "HmSvc2026R4mL8jTv")
+    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD")
+    if not sasl_password:
+        parser.error(
+            "KAFKA_SASL_PASSWORD environment variable is required "
+            "(copy .env.example to .env and set it)"
+        )
 
     # ---------------------------------------------------------------- Machines
     all_machines = build_all_machines(args.sim_seed)

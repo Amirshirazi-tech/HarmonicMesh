@@ -208,7 +208,12 @@ def main(argv=None) -> int:
 
     kafka_bootstrap = args.kafka_bootstrap
     sasl_username = os.environ.get("KAFKA_SASL_USERNAME", "harmonicmesh")
-    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD", "HmSvc2026R4mL8jTv")
+    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD")
+    if not sasl_password:
+        raise SystemExit(
+            "KAFKA_SASL_PASSWORD environment variable is required "
+            "(copy .env.example to .env and set it)"
+        )
 
     rng = random.Random(args.sim_seed)
 
