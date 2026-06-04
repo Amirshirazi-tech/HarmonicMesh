@@ -15,8 +15,8 @@ Flink CEP detects recurring signatures; Graphiti remembers them.
 ### 1. Clone and configure credentials
 
 ```bash
-git clone https://github.com/Amirshirazi-tech/harmonicmesh.git
-cd harmonicmesh
+git clone https://github.com/Amirshirazi-tech/HarmonicMesh.git
+cd HarmonicMesh
 ```
 
 Copy the environment template and set your passwords:
@@ -108,7 +108,6 @@ harmonicmesh.sensors.<machine-id>    # raw sensor telemetry
 harmonicmesh.edi.<partner-code>      # EDI process messages
 harmonicmesh.patterns.<machine-id>   # Flink CEP pattern matches
 harmonicmesh.alerts.<machine-id>     # agent-generated alerts
-harmonicmesh.training_records        # downstream training data (v2)
 ```
 
 ---
