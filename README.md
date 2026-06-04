@@ -98,6 +98,8 @@ docker compose down -v       # stop and delete all data volumes (full reset)
 | Flink TaskManager | flink:1.19-scala_2.12-java11 | — |
 | FastAPI | python:3.11-slim + fastapi | 8001 |
 
+The FastAPI service currently exposes only a /health endpoint; alert-serving endpoints are reserved for future work.
+
 All services share the `harmonicmeshnet` Docker network.
 Ports are offset +100 from a sibling stack so both can run simultaneously on the same host.
 
