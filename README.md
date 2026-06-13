@@ -3,6 +3,9 @@
 Real-time failure pattern detection with temporal memory for industrial operations.
 Flink CEP detects recurring signatures; Graphiti remembers them.
 
+📝 Read the story behind this project:
+[*Detection Without Memory Is Noise*](https://amir-noorishirazi.medium.com/detection-without-memory-is-noise-665343b6ea96)
+
 ---
 
 ## Quick Start
